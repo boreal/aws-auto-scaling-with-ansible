@@ -17,4 +17,8 @@
       name: "webapp-{{ fact_time }}"
       wait: yes
       state: present
+      tags:
+          Name: autogen_ami
+          role: template
+          env: production
   register: ami
