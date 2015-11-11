@@ -7,7 +7,7 @@
       name: "webapp-asg-{{ fact_time }}"
       region: "{{ region }}"
       load_balancers:
-          - 'webapp'
+          - "webapp-elb-{{ fact_time }}"
       availability_zones: "{{ zone }}"
       launch_config_name: "webapp-lc-{{ fact_time }}"
       default_cooldown: 180
@@ -16,7 +16,6 @@
       desired_capacity: 2
       state: present
       tags:
-          - Name: webapp-asg
           - env: prod
   register: asg_result
   tags: [asg]

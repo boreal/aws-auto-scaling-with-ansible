@@ -32,15 +32,9 @@
       - install-nginx
   tags: [nginx]
 
-#- hosts: ami_build
-#- hosts: "tag_Name_ami_build" # use this when launched using --tags
-#  user: "{{ login_user_debian }}"
 - hosts: localhost
   connection: local
   gather_facts: false
-  #become: true
-  #become_method: sudo
-  #become_user: root
   roles:
       - create-ami
       - create-lc

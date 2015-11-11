@@ -1,7 +1,7 @@
 ---
 # create-ami/tasks/main.yml
-- name: Gather ec2 facts
-  ec2_facts:
+#- name: Gather ec2 facts
+#  ec2_facts:
 
 #- debug: var=ansible_ec2_instance_id
 
@@ -9,7 +9,7 @@
   local_action:
       module: ec2_ami
       region: "{{ region }}"
-      instance_id: "{{ ansible_ec2_instance_id }}"
+      instance_id: "{{ ec2_info.instance_ids[0] }}"
       name: "webapp-ami-{{ fact_time }}"
       wait: yes
       state: present
