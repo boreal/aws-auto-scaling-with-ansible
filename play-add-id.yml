@@ -1,5 +1,5 @@
 ---
-- hosts: "tag_Name_ami_build"
+- hosts: "tag_env_prod"
   gather_facts: true
   user: "{{ login_user_debian }}"
   become: true
