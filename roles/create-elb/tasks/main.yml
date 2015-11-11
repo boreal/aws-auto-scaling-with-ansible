@@ -23,3 +23,6 @@
       unhealthy_threshold: 6
       healthy_threshold: 2
   register: elb_result
+
+  - name: debug output for elb_result
+    debug: var=elb_result
