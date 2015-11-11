@@ -14,5 +14,8 @@
       max_size: 5
       desired_capacity: 2
       state: present
+      tags:
+          Name: asg_webapp
+          env: prod
   register: ami
   tags: [asg]
