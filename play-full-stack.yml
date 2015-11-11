@@ -1,4 +1,12 @@
 ---
+- hosts: localhost
+  connection: local
+  tasks:
+      - name: set fact for time variable to use as part of the Name tag
+        set_fact:
+            fact_time: "{{ lookup('pipe', 'date \"+%Y%m%d%H%M%S\"') }}"
+  tags: [asg, terminate, instance, instance-ami]
+
 - hosts: "tag_Name_ami_build"
   gather_facts: false
   tasks:
@@ -24,10 +32,12 @@
       - install-nginx
   tags: [nginx]
 
-- hosts: ami_build
+#- hosts: ami_build
 #- hosts: "tag_Name_ami_build" # use this when launched using --tags
+#  user: "{{ login_user_debian }}"
+- hosts: localhost
+  connection: local
   gather_facts: false
-  user: "{{ login_user_debian }}"
   #become: true
   #become_method: sudo
   #become_user: root

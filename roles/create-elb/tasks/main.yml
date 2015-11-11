@@ -5,7 +5,7 @@
   local_action:
     module: ec2_elb_lb
     region: "{{ region }}"
-    name: webapp
+    name: "webapp-elb-{{ fact_time }}"
     state: present
     zones: "{{ zone }}"
     security_group_names: "{{ security_groups }}"

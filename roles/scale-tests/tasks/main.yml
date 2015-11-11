@@ -3,9 +3,14 @@
 
 - name: Update the apt-get cache
   apt: update_cache=yes
+  tags: [stress, test]
 
 - name: Install packages
   action: apt pkg={{ item }} state=installed
   with_items:
     - stress
+  tags: [stress, test]
+
+- name: start the stress test
+  shell: /usr/bin/stress -c 1 -i 1 -q &
   tags: [stress, test]

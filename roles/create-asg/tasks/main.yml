@@ -4,18 +4,91 @@
 - name: Create Auto Scaling Group
   local_action:
       module: ec2_asg
-      name: "webapp-{{ fact_time }}"
+      name: "webapp-asg-{{ fact_time }}"
       region: "{{ region }}"
       load_balancers:
           - 'webapp'
       availability_zones: "{{ zone }}"
-      launch_config_name: webapp-{{ fact_time }}
+      launch_config_name: "webapp-lc-{{ fact_time }}"
+      default_cooldown: 180
       min_size: 2
       max_size: 5
       desired_capacity: 2
       state: present
       tags:
-          Name: asg_webapp
-          env: prod
-  register: ami
+          - Name: webapp-asg
+          - env: prod
+  register: asg_result
+  tags: [asg]
+
+#- name: debug output for asg result
+#  debug: var=asg_result
+#  tags: [asg]
+
+- name: Create ASG scale up policy
+  local_action:
+    module: ec2_scaling_policy
+    state: present
+    region: "{{ region }}"
+    name: "webapp-asg-policy-scale-up"
+    asg_name: "webapp-asg-{{ fact_time }}"
+    adjustment_type: "ChangeInCapacity"
+    scaling_adjustment: +1
+    min_adjustment_step: 1
+    cooldown: 60
+  register: sp_up_result
+  tags: [asg]
+
+#- name: debug output for policy result
+#  debug: var=sp_up_result
+#  tags: [asg]
+
+- name: Create ASG scale down policy
+  local_action:
+    module: ec2_scaling_policy
+    state: present
+    region: "{{ region }}"
+    name: "webapp-asg-policy-scale-down"
+    asg_name: "webapp-asg-{{ fact_time }}"
+    adjustment_type: "ChangeInCapacity"
+    scaling_adjustment: -1
+    min_adjustment_step: 1
+    cooldown: 60
+  register: sp_down_result
+  tags: [asg]
+
+- name: Configure scale up metric alarm and link to scaling policy
+  ec2_metric_alarm:
+    region: "{{ region }}"
+    name: "webapp-metric-alarm-scale-up"
+    state: present
+    metric: "CPUUtilization"
+    namespace: "AWS/EC2"
+    statistic: "Average"
+    comparison: ">="
+    threshold: 50.0
+    period: 60
+    evaluation_periods: 1
+    unit: "Percent"
+    dimensions:
+      AutoScalingGroupName: webapp-asg-{{ fact_time }}
+    alarm_actions: ["{{ sp_up_result.arn }}"]
+  tags: [asg]
+
+- name: Configure scale down metric alarm and link to scaling policy
+  ec2_metric_alarm:
+    region: "{{ region }}"
+    name: "webapp-metric-alarm-scale-down"
+    state: present
+    metric: "CPUUtilization"
+    namespace: "AWS/EC2"
+    statistic: "Average"
+    comparison: "<="
+    threshold: 20.0
+    period: 60
+    evaluation_periods: 1
+    unit: "Percent"
+    dimensions:
+      AutoScalingGroupName: webapp-asg-{{ fact_time }}
+    alarm_actions: ["{{ sp_down_result.arn }}"]
   tags: [asg]
