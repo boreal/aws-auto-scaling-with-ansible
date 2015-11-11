@@ -1,0 +1,46 @@
+---
+- hosts: "tag_Name_ami_build"
+  gather_facts: false
+  tasks:
+    - name:  Find existing instance(s) and add to old-ami-build group
+      group_by:
+        key: old_ami_build
+  tags: [terminate]
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+      - launch-instance
+  tags: [instance, instance-ami]
+
+- hosts: ami_build
+  user: "{{ login_user_debian }}"
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: true
+  roles:
+      - nginx
+  tags: [nginx]
+
+- hosts: ami_build
+#- hosts: "tag_Name_ami_build" # use this when launched using --tags
+  gather_facts: false
+  user: "{{ login_user_debian }}"
+  #become: true
+  #become_method: sudo
+  #become_user: root
+  roles:
+      - create-ami
+      - create-lc
+      - create-elb
+      - create-asg
+  tags: [ami, instance-ami]
+
+- hosts: old_ami_build
+  connection: local
+  gather_facts: no
+  roles:
+    - terminate-instances
+  tags: [terminate]

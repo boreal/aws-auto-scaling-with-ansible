@@ -1,0 +1,15 @@
+---
+timezone: "America/Toronto"
+region: us-east-1
+zone: us-east-1a
+keypair: vmg-birch
+security_groups: vmg-sec-1
+instance_type: t2.micro
+instance_group: ami_build
+vpc_subnet_id: subnet-0ae3ef22
+delete_on_termination: true
+domain: boreal321.com
+ami_ubuntu: ami-d05e75b8
+ami_debian: ami-116d857a
+login_user_debian: admin
+login_user_ubuntu: ubuntu

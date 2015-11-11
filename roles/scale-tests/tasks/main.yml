@@ -1,0 +1,11 @@
+---
+# scale-tests/tasks/main.yml
+
+- name: Update the apt-get cache
+  apt: update_cache=yes
+
+- name: Install packages
+  action: apt pkg={{ item }} state=installed
+  with_items:
+    - stress
+  tags: [stress, test]

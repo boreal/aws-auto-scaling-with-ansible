@@ -1,0 +1,20 @@
+---
+# create-ami/tasks/main.yml
+- name: Gather ec2 facts
+  ec2_facts:
+
+#- debug: var=ansible_ec2_instance_id
+
+- name: set fact for time variable
+  set_fact:
+      fact_time: "{{lookup('pipe', 'date \"+%Y%m%d%H%M%S\"')}}"
+
+- name: Create AMI
+  local_action:
+      module: ec2_ami
+      region: "{{ region }}"
+      instance_id: "{{ ansible_ec2_instance_id }}"
+      name: "webapp-{{ fact_time }}"
+      wait: yes
+      state: present
+  register: ami

@@ -1,0 +1,19 @@
+---
+- hosts: "tag_Name_ami_build"
+  gather_facts: true
+  user: "{{ login_user_debian }}"
+  become: true
+  become_method: sudo
+  become_user: root
+  tasks:
+      - name: Gather ec2 facts
+        ec2_facts:
+
+      - name: Add unique identifier to index page to test load balancing is working
+        lineinfile:
+          dest: /var/www/html/index.nginx-debian.html
+          regexp: "{{ ansible_ec2_instance_id }}"
+          line: "<h2>{{ ansible_ec2_instance_id }}</h2>"
+          insertbefore: "</body>"
+          state: present
+  tags: [add-id]

@@ -1,0 +1,18 @@
+---
+# create-asg/tasks/main.yml
+
+- name: Create Auto Scaling Group
+  local_action:
+      module: ec2_asg
+      name: "webapp-{{ fact_time }}"
+      region: "{{ region }}"
+      load_balancers:
+          - 'webapp'
+      availability_zones: "{{ zone }}"
+      launch_config_name: webapp-{{ fact_time }}
+      min_size: 2
+      max_size: 5
+      desired_capacity: 2
+      state: present
+  register: ami
+  tags: [asg]
