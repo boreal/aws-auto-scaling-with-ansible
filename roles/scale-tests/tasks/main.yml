@@ -14,3 +14,7 @@
 - name: start the stress test
   shell: /usr/bin/stress -c 1 -i 1 -q &
   tags: [stress, test]
+
+- name: kill the stress test
+  shell: /bin/pidof stress && /usr/bin/pkill -9 stress
+  tags: [kill_stress]
