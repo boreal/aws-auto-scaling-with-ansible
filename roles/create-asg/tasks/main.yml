@@ -2,14 +2,15 @@
 # create-asg/tasks/main.yml
 
 - name: Create Auto Scaling Group
-  local_action:
-      module: ec2_asg
+  ec2_asg:
       name: "webapp-asg-{{ fact_time }}"
       region: "{{ region }}"
       load_balancers:
           - "webapp-elb-{{ fact_time }}"
       availability_zones: "{{ zone }}"
       launch_config_name: "webapp-lc-{{ fact_time }}"
+      health_check_type: ELB
+      health_check_period: 300
       default_cooldown: 180
       min_size: 2
       max_size: 5
@@ -25,16 +26,15 @@
 #  tags: [asg]
 
 - name: Create ASG scale up policy
-  local_action:
-    module: ec2_scaling_policy
-    state: present
-    region: "{{ region }}"
-    name: "webapp-asg-policy-scale-up"
-    asg_name: "webapp-asg-{{ fact_time }}"
-    adjustment_type: "ChangeInCapacity"
-    scaling_adjustment: +1
-    min_adjustment_step: 1
-    cooldown: 60
+  ec2_scaling_policy:
+      state: present
+      region: "{{ region }}"
+      name: "webapp-asg-policy-scale-up"
+      asg_name: "webapp-asg-{{ fact_time }}"
+      adjustment_type: "ChangeInCapacity"
+      scaling_adjustment: +1
+      min_adjustment_step: 1
+      cooldown: 60
   register: sp_up_result
   tags: [asg]
 
@@ -43,16 +43,15 @@
 #  tags: [asg]
 
 - name: Create ASG scale down policy
-  local_action:
-    module: ec2_scaling_policy
-    state: present
-    region: "{{ region }}"
-    name: "webapp-asg-policy-scale-down"
-    asg_name: "webapp-asg-{{ fact_time }}"
-    adjustment_type: "ChangeInCapacity"
-    scaling_adjustment: -1
-    min_adjustment_step: 1
-    cooldown: 60
+  ec2_scaling_policy:
+      state: present
+      region: "{{ region }}"
+      name: "webapp-asg-policy-scale-down"
+      asg_name: "webapp-asg-{{ fact_time }}"
+      adjustment_type: "ChangeInCapacity"
+      scaling_adjustment: -1
+      min_adjustment_step: 1
+      cooldown: 60
   register: sp_down_result
   tags: [asg]
 
